@@ -2,12 +2,13 @@
 
 SKIP_RC=0
 BATCH_INSTALL=0
+USE_CLANG=0
 
 THIS_DIR=$(cd $(dirname $0); pwd)
 PREFIX=${PREFIX:-"${THIS_DIR}/install"}
 TORCH_LUA_VERSION=${TORCH_LUA_VERSION:-"LUAJIT21"} # by default install LUAJIT21
 
-while getopts 'bsh:' x; do
+while getopts 'bcsh:' x; do
     case "$x" in
         h)
             echo "usage: $0
@@ -20,6 +21,9 @@ This script will install Torch and related, useful packages into $PREFIX.
             ;;
         b)
             BATCH_INSTALL=1
+            ;;
+        c)
+            USE_CLANG=1
             ;;
         s)
             SKIP_RC=1
@@ -46,6 +50,10 @@ git submodule update --init --recursive
 
 # If we're on OS X, use clang
 if [[ `uname` == "Darwin" ]]; then
+    USE_CLANG=1
+fi
+
+if [ ${USE_CLANG} == 1 ] ; then
     # make sure that we build with Clang. CUDA's compiler nvcc
     # does not play nice with any recent GCC version.
     export CC=clang
